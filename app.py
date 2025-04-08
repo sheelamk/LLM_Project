@@ -1,28 +1,22 @@
-#app.py
-
 import streamlit as st
-import os
-from dotenv import load_dotenv
 from groq import Groq
 
-# Load API key from .env
-load_dotenv()
-groq_api_key = os.getenv("GROQ_API_KEY")
-
-# Validate API key
-if not groq_api_key:
-    st.error("❌ GROQ_API_KEY not found. Please check your .env file.")
+# Load GROQ_API_KEY from secrets.toml (local and Streamlit Cloud)
+try:
+    groq_api_key = st.secrets["GROQ_API_KEY"]
+except KeyError:
+    st.error("❌ GROQ_API_KEY not found. Please check your secrets.toml file or Streamlit Secrets.")
     st.stop()
 
 # Initialize Groq client
 client = Groq(api_key=groq_api_key)
 
 # Streamlit UI Setup
-st.set_page_config(page_title="StratoBot (implies high-level speed and efficiency)", layout="centered")
-st.title("⚡StratoBot (implies high-level speed and efficiency)")
+st.set_page_config(page_title="StratoBot", layout="centered")
+st.title("⚡ StratoBot")
 st.caption("Powered by Groq API | Multi-Model Chat App")
 
-#  Sidebar Settings
+# Sidebar Settings
 available_models = [
     "llama3-70b-8192",
     "llama3-8b-8192",
@@ -49,7 +43,7 @@ if prompt:
     st.chat_message("user").markdown(prompt)
     st.session_state["messages"].append({"role": "user", "content": prompt})
 
-    # --- Make API call using Groq client ---
+    # Make API call using Groq client
     try:
         chat_completion = client.chat.completions.create(
             messages=st.session_state["messages"],
@@ -59,7 +53,7 @@ if prompt:
 
         reply = chat_completion.choices[0].message.content
 
-        # Capture token usage
+        # Token usage details
         usage = chat_completion.usage
         prompt_tokens = usage.prompt_tokens
         completion_tokens = usage.completion_tokens
@@ -68,7 +62,7 @@ if prompt:
         st.chat_message("assistant").markdown(reply)
         st.session_state["messages"].append({"role": "assistant", "content": reply})
 
-        # --- Token Usage Display ---
+        # Token Usage Display
         with st.sidebar:
             st.subheader("🔩 Token Usage")
             st.write(f"**Prompt Tokens:** {prompt_tokens}")
@@ -77,5 +71,3 @@ if prompt:
 
     except Exception as e:
         st.error(f"❗ Error: {e}")
-
-       
