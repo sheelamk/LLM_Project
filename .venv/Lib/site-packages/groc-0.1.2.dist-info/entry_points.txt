@@ -1,0 +1,3 @@
+[console_scripts]
+groc = groc.__main__:safe_entry_point
+
