@@ -1,15 +1,12 @@
 import streamlit as st
 import requests
-import os
-from dotenv import load_dotenv
 
-# --- Load API key from .env ---
-load_dotenv()
-groq_api_key = os.getenv("GROQ_API_KEY")
+# --- Load API key from Streamlit Secrets ---
+groq_api_key = st.secrets["GROQ_API_KEY"]
 
 # --- Validate API key ---
 if not groq_api_key:
-    st.error("❌ GROQ_API_KEY not found. Please check your .env file.")
+    st.error("❌ GROQ_API_KEY not found. Please check your Streamlit secrets.")
     st.stop()
 
 # --- API Settings ---
